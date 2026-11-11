@@ -20,4 +20,4 @@ This is a **pnpm monorepo**. It separates the public-facing static site from the
 ### Installation
 From the monorepo root:
 ```bash
-pnpm install
+
