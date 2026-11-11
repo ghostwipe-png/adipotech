@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Adipotech logo">
+  <rect width="512" height="512" fill="#0f172a"/>
+  <g fill="#ffffff">
+    <path d="M148 300 L196 168 L228 168 L276 300 L244 300 L236 278 L188 278 L180 300 Z M196 254 L228 254 L212 210 Z"/>
+    <path d="M300 168 L372 168 L372 196 L350 196 L350 300 L322 300 L322 196 L300 196 Z"/>
+  </g>
+  <g transform="translate(256 372)">
+    <path fill="#38bdf8" d="M0 -34 L34 -22 L34 4 C34 22 18 32 0 38 C-18 32 -34 22 -34 4 L-34 -22 Z"/>
+    <path fill="#0f172a" d="M-12 0 L-3 10 L14 -12 L20 -6 L-3 20 L-18 6 Z"/>
+  </g>
+</svg>

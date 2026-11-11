@@ -1,0 +1,13 @@
+{
+  "name": "ad-platform-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev:site": "pnpm --filter site dev",
+    "build:site": "pnpm --filter site build"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  },
+  "packageManager": "pnpm@9.0.0"
+}

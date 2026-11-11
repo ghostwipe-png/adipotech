@@ -1,0 +1,180 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Terms of Service | Adipotech';
+const description = 'Read the Terms of Service for using Adipotech, including subscription rules, donation policies, and acceptable use.';
+const lastUpdated = 'November 12, 2026';
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="page-container">
+    <header class="hero">
+      <h1>Terms of Service</h1>
+      <p class="last-updated">Last Updated: {lastUpdated}</p>
+      <p class="lead">Please read these Terms of Service carefully before using the Adipotech platform. By accessing or using our services, you agree to be bound by these terms.</p>
+    </header>
+
+    <section class="content-section">
+      <h2>1. Acceptance of Terms</h2>
+      <p>
+        By accessing Adipotech (the "Platform"), you agree to these Terms of Service ("Terms"). If you do not agree to all of these Terms, you are prohibited from using the Platform. We reserve the right to update these Terms at any time, and your continued use of the Platform constitutes acceptance of those changes.
+      </p>
+    </section>
+
+    <section class="content-section">
+      <h2>2. Description of Service</h2>
+      <p>
+        Adipotech is a media distribution and advertisement platform. It allows users to view public content, engage via comments and likes, and access premium content (such as high-resolution media, PDFs, and exclusive videos) via a paid subscription or per-post donation. 
+      </p>
+      <p>
+        <strong>Important:</strong> Only administrators can upload content. Users are strictly prohibited from uploading files, images, or media of any kind unless explicitly authorized by an active premium agreement that grants such access.
+      </p>
+    </section>
+
+    <section class="content-section">
+      <h2>3. Subscriptions and Payments</h2>
+      <p>Premium access is offered on a recurring subscription basis, billed in Kenyan Shillings (KES) via our payment processor, Paystack.</p>
+      <ul>
+        <li><strong>Billing Cycle:</strong> Subscriptions renew automatically unless canceled before the next billing date.</li>
+        <li><strong>Payment Failure:</strong> If a recurring payment fails, you have a 3-day grace period to update your payment method. After 3 days, your premium access will be suspended.</li>
+        <li><strong>Account Deletion:</strong> If your payment remains overdue for one (1) month, your account and associated data will be permanently deleted as outlined in our Privacy Policy.</li>
+      </ul>
+    </section>
+
+    <section class="content-section highlight-section">
+      <h2>4. No Refund Policy</h2>
+      <p>Because our premium content is digital and immediately accessible upon payment, we enforce a strict no-refund policy:</p>
+      <ul>
+        <li><strong>Subscriptions:</strong> All subscription payments are final. We do not offer refunds for partial subscription periods or unused time.</li>
+        <li><strong>Donations:</strong> Donations made to unlock specific content are considered voluntary and final. No refunds will be issued for donations.</li>
+        <li><strong>Exceptions:</strong> Refunds may only be granted at our sole discretion in the event of a verified duplicate charge or a critical technical error caused by the platform that prevented access.</li>
+      </ul>
+    </section>
+
+    <section class="content-section">
+      <h2>5. User Conduct and Comments</h2>
+      <p>You are solely responsible for your interactions on the Platform. By posting comments, you agree not to:</p>
+      <ul>
+        <li>Post spam, unsolicited advertisements, or fraudulent links.</li>
+        <li>Use abusive, defamatory, or hateful language.</li>
+        <li>Distribute viruses, malware, or any other harmful code.</li>
+        <li>Violate any local, national, or international laws (including the Kenya Data Protection Act).</li>
+      </ul>
+      <p>We reserve the right to moderate, delete, or ban any user or comment that violates these terms, without prior notice or refund.</p>
+    </section>
+
+    <section class="content-section">
+      <h2>6. Intellectual Property</h2>
+      <p>
+        All content published on Adipotech (including advertisements, images, videos, and PDFs) is the property of Adipotech or its licensors and is protected by copyright laws. You may not reproduce, distribute, or create derivative works from this content without explicit written permission. Downloading premium content grants you a personal, non-transferable license for private use only.
+      </p>
+    </section>
+
+    <section class="content-section">
+      <h2>7. Limitation of Liability</h2>
+      <p>
+        To the maximum extent permitted by law, Adipotech shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of the Platform.
+      </p>
+    </section>
+
+    <section class="content-section">
+      <h2>8. Governing Law</h2>
+      <p>
+        These Terms shall be governed by and construed in accordance with the laws of the Republic of Kenya, without regard to its conflict of law principles. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts in Kenya.
+      </p>
+    </section>
+
+    <section class="content-section">
+      <h2>9. Contact</h2>
+      <p>
+        For questions regarding these Terms, please contact us at <a href="mailto:adipotech@gmail.com">adipotech@gmail.com</a>.
+      </p>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .page-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    color: #334155;
+  }
+
+  .hero {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .last-updated {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero .lead {
+    font-size: 1.125rem;
+    color: #475569;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .content-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .content-section h2 {
+    font-size: 1.5rem;
+    color: #0f172a;
+    margin-bottom: 1rem;
+  }
+
+  .content-section p, .content-section li {
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .content-section ul {
+    padding-left: 1.5rem;
+  }
+
+  .content-section li {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Highlight the No Refund section */
+  .highlight-section {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 1.5rem;
+    border-left: 4px solid #ef4444;
+  }
+
+  .highlight-section h2 {
+    color: #991b1b;
+    margin-top: 0;
+  }
+
+  a {
+    color: #0f172a;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    color: #38bdf8;
+  }
+</style>
