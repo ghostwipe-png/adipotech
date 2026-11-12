@@ -13,5 +13,9 @@ export default defineConfig({
     build: {
       cssMinify: 'lightningcss',
     },
+    // Ignore the Cloudflare functions folder during Vite build
+    optimizeDeps: {
+      exclude: ['functions'],
+    },
   },
 });
