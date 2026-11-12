@@ -6,8 +6,20 @@ export interface Env {
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    const url = new URL(request.url);
-    const headers = { 'Content-Type': 'application/json', 'X-Content-Type-Options': 'nosniff' };
+	    const url = new URL(request.url);
+    const headers = { 
+      'Content-Type': 'application/json', 
+      'X-Content-Type-Options': 'nosniff',
+      'Access-Control-Allow-Origin': '*', // Allow frontend to call this
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    };
+
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers });
+    }
+    
 
     try {
       if (url.pathname === '/health' && request.method === 'GET') {

@@ -92,6 +92,21 @@ export default {
         return new Response(JSON.stringify({ policy }), { headers });
       }
 
+            // Public route: Get safe post data for the frontend
+      if (url.pathname.startsWith('/public/post/') && request.method === 'GET') {
+        const postId = url.pathname.split('/').pop();
+        
+        const { results } = await env.adipotech_policy_db.prepare(
+          `SELECT id, title, description, media_url, media_type FROM posts WHERE id = ?`
+        ).bind(postId).all();
+
+        if (results.length === 0) {
+          return new Response(JSON.stringify({ error: 'Post not found' }), { status: 404, headers });
+        }
+
+        return new Response(JSON.stringify({ post: results[0] }), { headers });
+      }
+
       // Default: Deny access to unknown routes
       return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404, headers });
 
