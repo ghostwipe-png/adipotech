@@ -1,5 +1,6 @@
 export interface Env {
   adipotech_policy_db: D1Database;
+  INTERNAL_API_KEY: string;
 }
 
 export default {
@@ -74,6 +75,21 @@ export default {
         ).run();
 
         return new Response(JSON.stringify({ success: true, message: 'Policy set' }), { status: 201, headers });
+      }
+
+            // Internal route for Entitlement Service
+      if (url.pathname === '/internal/policy' && request.method === 'GET') {
+        const postId = url.searchParams.get('post_id');
+        if (!postId) {
+          return new Response(JSON.stringify({ error: 'post_id required' }), { status: 400, headers });
+        }
+
+        const { results } = await env.adipotech_policy_db.prepare(
+          `SELECT * FROM policies WHERE post_id = ?`
+        ).bind(postId).all();
+
+        const policy = results[0] || null;
+        return new Response(JSON.stringify({ policy }), { headers });
       }
 
       // Default: Deny access to unknown routes
