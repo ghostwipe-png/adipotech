@@ -25,22 +25,29 @@ const description = 'View exclusive content.';
     </div>
   </main>
 
-  <script is:inline>
+    <script is:inline>
     // In a real app, this would come from your login system.
-    // For now, we use the test user we created in the database.
     const USER_ID = 'test_user'; 
-    const POST_ID = 'post_003'; // We are testing the premium post
+    const POST_ID = 'post_003'; 
 
+    // The exact public-service URL
     const PUBLIC_API_URL = 'https://public-service.opinionplus.workers.dev';
     const ENTITLEMENT_URL = 'https://entitlement-service.opinionplus.workers.dev';
 
     async function loadContent() {
+      const fetchUrl = `${PUBLIC_API_URL}/api/post/${POST_ID}`;
+      console.log("Attempting to fetch from:", fetchUrl); // This will prove the code is updated
+
       try {
         // 1. Fetch post data (Public)
-        const postRes = await fetch(`${PUBLIC_API_URL}/public/post/${POST_ID}`);
-        const postData = await postRes.json();
+        const postRes = await fetch(fetchUrl);
         
-        if (!postData.post) throw new Error('Post not found');
+        if (!postRes.ok) {
+          throw new Error(`Server returned ${postRes.status}`);
+        }
+
+        const postData = await postRes.json();
+        if (!postData.post) throw new Error('Post data missing from response');
 
         // 2. Check Entitlements (Public)
         const checkRes = await fetch(`${ENTITLEMENT_URL}/check`, {
@@ -57,11 +64,11 @@ const description = 'View exclusive content.';
           document.getElementById('content-view').style.display = 'block';
           document.getElementById('post-title').textContent = postData.post.title;
           document.getElementById('post-desc').textContent = postData.post.description;
-          // If you have a real file, set the href here
           document.getElementById('download-link').href = postData.post.media_url || '#';
         } else {
           document.getElementById('locked-view').style.display = 'block';
           const ul = document.getElementById('missing-requirements');
+          ul.innerHTML = ''; // Clear previous
           checkData.missing.forEach(req => {
             const li = document.createElement('li');
             li.textContent = `Requirement: ${req}`;
@@ -69,14 +76,13 @@ const description = 'View exclusive content.';
           });
         }
       } catch (err) {
-        console.error(err);
-        document.getElementById('loading').textContent = 'Error loading content.';
+        console.error("Error details:", err);
+        document.getElementById('loading').textContent = `Error loading content: ${err.message}`;
       }
     }
 
     loadContent();
   </script>
-
   <style>
     .page-container { max-width: 800px; margin: 0 auto; padding: 3rem 1.25rem; font-family: system-ui; }
     .status-message { text-align: center; font-size: 1.25rem; color: #64748b; }
