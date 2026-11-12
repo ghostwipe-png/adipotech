@@ -59,7 +59,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       try {
         const res = await fetch(`${ADMIN_URL}/api/upload`, {
           method: 'POST',
-          body: formData
+          body: formData,
+          credentials: 'include' // <--- CRITICAL FIX: Sends Cloudflare Access cookie
         });
         
         const data = await res.json();
@@ -105,7 +106,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         const postRes = await fetch(`${ADMIN_URL}/api/posts`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(postData)
+          body: JSON.stringify(postData),
+          credentials: 'include' // <--- CRITICAL FIX
         });
         if (!postRes.ok) throw new Error('Failed to create post');
 
@@ -113,7 +115,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         const policyRes = await fetch(`${ADMIN_URL}/api/policies`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(policyData)
+          body: JSON.stringify(policyData),
+          credentials: 'include' // <--- CRITICAL FIX
         });
         if (!policyRes.ok) throw new Error('Failed to set policy');
 
