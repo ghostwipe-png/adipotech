@@ -10,9 +10,10 @@ export default {
     const headers = { 
       'Content-Type': 'application/json', 
       'X-Content-Type-Options': 'nosniff',
-      'Access-Control-Allow-Origin': '*', // Allow frontend to call this
+      'Access-Control-Allow-Origin': 'https://adipotech.pages.dev', // Allow frontend to call this
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type'
+      
     };
 
     // Handle CORS preflight
