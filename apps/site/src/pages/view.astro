@@ -31,13 +31,13 @@ const description = 'View exclusive content.';
     const USER_ID = 'test_user'; 
     const POST_ID = 'post_003'; // We are testing the premium post
 
-    const ADMIN_URL = 'https://admin-service.opinionplus.workers.dev';
+    const PUBLIC_API_URL = 'https://public-service.opinionplus.workers.dev';
     const ENTITLEMENT_URL = 'https://entitlement-service.opinionplus.workers.dev';
 
     async function loadContent() {
       try {
         // 1. Fetch post data (Public)
-        const postRes = await fetch(`${ADMIN_URL}/public/post/${POST_ID}`);
+        const postRes = await fetch(`${PUBLIC_API_URL}/public/post/${POST_ID}`);
         const postData = await postRes.json();
         
         if (!postData.post) throw new Error('Post not found');
