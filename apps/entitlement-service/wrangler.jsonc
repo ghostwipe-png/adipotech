@@ -12,6 +12,10 @@
       "binding": "ADMIN_SERVICE",
       "service": "admin-service"
 	  
-    }
+    },
+	{
+	  "binding": "SUBSCRIPTION_SERVICE",
+	  "service": "subscription-service"
+	}
   ]
 }

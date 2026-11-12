@@ -1,5 +1,6 @@
 export interface Env {
   ADMIN_SERVICE: Fetcher;
+  SUBSCRIPTION_SERVICE: Fetcher;
   INTERNAL_API_KEY: string;
 }
 
@@ -23,7 +24,10 @@ export default {
         // 1. Fetch the real policy from the Admin Service via Service Binding
         const policyReq = new Request(`http://admin-service/internal/policy?post_id=${body.post_id}`, {
           method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Internal-Key': env.INTERNAL_API_KEY // Authenticate with Admin Service
+          }
         });
 
         const policyRes = await env.ADMIN_SERVICE.fetch(policyReq);
@@ -36,9 +40,29 @@ export default {
         }
 
         const missingRequirements: string[] = [];
+        const userId = body.user_id || 'test_user'; // Default to test_user for our simulation
 
-        // 3. Evaluate requirements (Simulated user data for now)
-        const userIsSubscribed = false; 
+        // 3. Check Subscription Status via Service Binding
+        let userIsSubscribed = false;
+        if (policy.require_subscribe === 1) {
+          const subReq = new Request(`http://subscription-service/status?user_id=${userId}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          try {
+            const subRes = await env.SUBSCRIPTION_SERVICE.fetch(subReq);
+            const subData = await subRes.json() as any;
+            // The subscription is valid if status is explicitly 'active'
+            userIsSubscribed = (subData.status === 'active');
+          } catch (e) {
+            console.error('Failed to reach Subscription Service:', e);
+            // Fail closed on error - user is not subscribed if we can't verify
+            userIsSubscribed = false;
+          }
+        }
+
+        // 4. Evaluate other requirements (Simulated for now)
         const userHasLiked = false;
         const userHasCommented = false;
         const userDonationAmount = 0;
@@ -50,6 +74,7 @@ export default {
           missingRequirements.push('donate');
         }
 
+        // 5. Final Decision
         if (missingRequirements.length > 0) {
           return new Response(JSON.stringify({ allowed: false, missing: missingRequirements }), { status: 200, headers });
         }
