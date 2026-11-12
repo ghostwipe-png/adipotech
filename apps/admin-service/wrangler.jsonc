@@ -1,10 +1,20 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "admin-service",
-  "main": "src/index.ts",
-  "compatibility_date": "2026-11-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "observability": {
-    "enabled": true
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "admin-service",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-11-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"observability": {
+		"enabled": true
+	},
+	"d1_databases": [
+		{
+			"binding": "adipotech_policy_db",
+			"database_name": "adipotech-policy-db",
+			"database_id": "9ce65090-4be9-4d8a-a758-6cdbd5667dad",
+			"remote": true
+		}
+	]
 }
