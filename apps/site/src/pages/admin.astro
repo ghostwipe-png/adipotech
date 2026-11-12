@@ -1,0 +1,143 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Admin Dashboard" description="Admin Panel">
+  <main class="admin-container">
+    <h1>Admin Dashboard</h1>
+    <p class="note">Note: This page is publicly accessible, but the API calls will fail unless you are authenticated via Cloudflare Zero Trust.</p>
+
+    <div class="card">
+      <h2>Create New Post</h2>
+      <form id="post-form">
+        <div class="form-group">
+          <label>Post ID (e.g., post_004)</label>
+          <input type="text" id="post-id" required>
+        </div>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="post-title" required>
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <textarea id="post-desc" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Upload File (Image, PDF, Video)</label>
+          <input type="file" id="post-file">
+        </div>
+
+        <h3>Enforcement Rules</h3>
+        <div class="checkbox-group">
+          <label><input type="checkbox" id="req-like"> Require Like</label>
+          <label><input type="checkbox" id="req-comment"> Require Comment</label>
+          <label><input type="checkbox" id="req-sub"> Require Subscription</label>
+        </div>
+
+        <button type="submit" id="submit-btn">Publish Post</button>
+        <p id="status-msg"></p>
+      </form>
+    </div>
+  </main>
+
+  <script is:inline>
+    const ADMIN_URL = 'https://admin-service.opinionplus.workers.dev';
+    let uploadedMediaUrl = null;
+    let uploadedMediaType = null;
+
+    // 1. Handle File Upload
+    document.getElementById('post-file').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      document.getElementById('status-msg').textContent = 'Uploading file...';
+      
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const res = await fetch(`${ADMIN_URL}/api/upload`, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const data = await res.json();
+        if (res.ok) {
+          uploadedMediaUrl = data.url;
+          uploadedMediaType = data.type;
+          document.getElementById('status-msg').textContent = 'File uploaded successfully!';
+        } else {
+          throw new Error(data.error || 'Upload failed');
+        }
+      } catch (err) {
+        document.getElementById('status-msg').textContent = `Upload Error: ${err.message}`;
+      }
+    });
+
+    // 2. Handle Form Submit
+    document.getElementById('post-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      document.getElementById('status-msg').textContent = 'Publishing...';
+
+      const postId = document.getElementById('post-id').value;
+      
+      const postData = {
+        id: postId,
+        title: document.getElementById('post-title').value,
+        description: document.getElementById('post-desc').value,
+        media_url: uploadedMediaUrl,
+        media_type: uploadedMediaType
+      };
+
+      const policyData = {
+        post_id: postId,
+        require_like: document.getElementById('req-like').checked,
+        require_comment: document.getElementById('req-comment').checked,
+        require_subscribe: document.getElementById('req-sub').checked,
+        require_donate_amount: 0
+      };
+
+      try {
+        // Create Post
+        const postRes = await fetch(`${ADMIN_URL}/api/posts`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postData)
+        });
+        if (!postRes.ok) throw new Error('Failed to create post');
+
+        // Set Policy
+        const policyRes = await fetch(`${ADMIN_URL}/api/policies`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(policyData)
+        });
+        if (!policyRes.ok) throw new Error('Failed to set policy');
+
+        document.getElementById('status-msg').textContent = 'Post published successfully!';
+        document.getElementById('post-form').reset();
+        uploadedMediaUrl = null;
+        uploadedMediaType = null;
+      } catch (err) {
+        document.getElementById('status-msg').textContent = `Error: ${err.message}`;
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+  <style>
+    .admin-container { max-width: 800px; margin: 0 auto; padding: 3rem 1.25rem; font-family: system-ui; }
+    .note { background: #fef2f2; color: #991b1b; padding: 1rem; border-radius: 8px; border: 1px solid #fecaca; margin-bottom: 2rem; }
+    .card { background: #f8fafc; border: 1px solid #e2e8f0; padding: 2rem; border-radius: 12px; }
+    .form-group { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .form-group input, .form-group textarea { padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; }
+    .checkbox-group { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem; }
+    button { background: #0f172a; color: white; border: none; padding: 1rem 2rem; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    button:disabled { background: #94a3b8; cursor: not-allowed; }
+    #status-msg { margin-top: 1rem; font-weight: bold; color: #38bdf8; }
+  </style>
+</BaseLayout>

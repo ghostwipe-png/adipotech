@@ -1,25 +1,40 @@
 export interface Env {
   adipotech_policy_db: D1Database;
   INTERNAL_API_KEY: string;
+  adipotech_media: R2Bucket;
 }
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
-
-    // Security Headers applied to all responses
-    const headers = {
-      'Content-Type': 'application/json',
+    const headers = { 
+      'Content-Type': 'application/json', 
       'X-Content-Type-Options': 'nosniff',
+      'Access-Control-Allow-Origin': '*', // Allow frontend to call this
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
     };
 
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { headers });
+    }
+
     try {
-      // 1. Health Check
+      // 1. Internal API Check (For Entitlement Service)
+      if (url.pathname.startsWith('/internal/')) {
+        const providedKey = request.headers.get('X-Internal-Key');
+        if (!providedKey || providedKey !== env.INTERNAL_API_KEY) {
+          return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers });
+        }
+      }
+
+      // 2. Health Check
       if (url.pathname === '/health' && request.method === 'GET') {
         return new Response(JSON.stringify({ status: 'ok', service: 'admin-service' }), { headers });
       }
 
-      // 2. Create a new Post (Admin Only)
+      // 3. Create a new Post (Admin Only)
       if (url.pathname === '/api/posts' && request.method === 'POST') {
         const body = await request.json() as any;
         
@@ -27,7 +42,6 @@ export default {
           return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers });
         }
 
-        // Insert into posts table
         await env.adipotech_policy_db.prepare(
           `INSERT INTO posts (id, title, description, media_url, media_type) VALUES (?, ?, ?, ?, ?)`
         ).bind(
@@ -41,7 +55,7 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Post created' }), { status: 201, headers });
       }
 
-      // 3. List all Posts (Admin Only)
+      // 4. List all Posts (Admin Only)
       if (url.pathname === '/api/posts' && request.method === 'GET') {
         const { results } = await env.adipotech_policy_db.prepare(
           `SELECT * FROM posts ORDER BY created_at DESC`
@@ -50,7 +64,7 @@ export default {
         return new Response(JSON.stringify({ posts: results }), { headers });
       }
 
-      // 4. Set Enforcement Policy for a Post
+      // 5. Set Enforcement Policy for a Post
       if (url.pathname === '/api/policies' && request.method === 'POST') {
         const body = await request.json() as any;
 
@@ -77,7 +91,30 @@ export default {
         return new Response(JSON.stringify({ success: true, message: 'Policy set' }), { status: 201, headers });
       }
 
-            // Internal route for Entitlement Service
+      // 6. Upload Media (Admin Only)
+      if (url.pathname === '/api/upload' && request.method === 'POST') {
+        const formData = await request.formData();
+        const file = formData.get('file') as File;
+
+        if (!file) {
+          return new Response(JSON.stringify({ error: 'No file provided' }), { status: 400, headers });
+        }
+
+        const ext = file.name.split('.').pop();
+        const filename = `${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+
+        // Upload to R2 using the correct binding
+        await env.adipotech_media.put(filename, file.stream(), {
+          httpMetadata: { contentType: file.type }
+        });
+
+        // Placeholder URL (we will configure a public R2 domain later)
+        const fileUrl = `https://media.adipotech.co.ke/${filename}`; 
+
+        return new Response(JSON.stringify({ success: true, url: fileUrl, type: file.type }), { status: 201, headers });
+      }
+
+      // 7. Internal route for Entitlement Service to read policies
       if (url.pathname === '/internal/policy' && request.method === 'GET') {
         const postId = url.searchParams.get('post_id');
         if (!postId) {
@@ -92,10 +129,14 @@ export default {
         return new Response(JSON.stringify({ policy }), { headers });
       }
 
-            // Public route: Get safe post data for the frontend
+      // 8. Public route: Get safe post data for the frontend
       if (url.pathname.startsWith('/public/post/') && request.method === 'GET') {
         const postId = url.pathname.split('/').pop();
         
+        if (!postId) {
+          return new Response(JSON.stringify({ error: 'Post ID required' }), { status: 400, headers });
+        }
+
         const { results } = await env.adipotech_policy_db.prepare(
           `SELECT id, title, description, media_url, media_type FROM posts WHERE id = ?`
         ).bind(postId).all();

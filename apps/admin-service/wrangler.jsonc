@@ -16,5 +16,12 @@
 			"database_id": "9ce65090-4be9-4d8a-a758-6cdbd5667dad",
 			"remote": true
 		}
+	],
+	"r2_buckets": [
+		{
+			"bucket_name": "adipotech-media",
+			"binding": "adipotech_media",
+			"remote": true
+		}
 	]
 }
