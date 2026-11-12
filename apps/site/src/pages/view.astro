@@ -1,0 +1,89 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'View Content | Adipotech';
+const description = 'View exclusive content.';
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="page-container">
+    <div id="loading" class="status-message">Loading content...</div>
+    
+    <div id="locked-view" class="locked-container" style="display: none;">
+      <h2>Premium Content</h2>
+      <p>You must meet the following requirements to unlock this content:</p>
+      <ul id="missing-requirements"></ul>
+      <button class="unlock-btn">Subscribe Now</button>
+    </div>
+
+    <div id="content-view" style="display: none;">
+      <h1 id="post-title"></h1>
+      <p id="post-desc"></p>
+      <div class="media-container">
+        <a id="download-link" href="#" class="download-btn">Download / View File</a>
+      </div>
+    </div>
+  </main>
+
+  <script is:inline>
+    // In a real app, this would come from your login system.
+    // For now, we use the test user we created in the database.
+    const USER_ID = 'test_user'; 
+    const POST_ID = 'post_003'; // We are testing the premium post
+
+    const ADMIN_URL = 'https://admin-service.opinionplus.workers.dev';
+    const ENTITLEMENT_URL = 'https://entitlement-service.opinionplus.workers.dev';
+
+    async function loadContent() {
+      try {
+        // 1. Fetch post data (Public)
+        const postRes = await fetch(`${ADMIN_URL}/public/post/${POST_ID}`);
+        const postData = await postRes.json();
+        
+        if (!postData.post) throw new Error('Post not found');
+
+        // 2. Check Entitlements (Public)
+        const checkRes = await fetch(`${ENTITLEMENT_URL}/check`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ post_id: POST_ID, action: 'download', user_id: USER_ID })
+        });
+        const checkData = await checkRes.json();
+
+        document.getElementById('loading').style.display = 'none';
+
+        // 3. Render
+        if (checkData.allowed) {
+          document.getElementById('content-view').style.display = 'block';
+          document.getElementById('post-title').textContent = postData.post.title;
+          document.getElementById('post-desc').textContent = postData.post.description;
+          // If you have a real file, set the href here
+          document.getElementById('download-link').href = postData.post.media_url || '#';
+        } else {
+          document.getElementById('locked-view').style.display = 'block';
+          const ul = document.getElementById('missing-requirements');
+          checkData.missing.forEach(req => {
+            const li = document.createElement('li');
+            li.textContent = `Requirement: ${req}`;
+            ul.appendChild(li);
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loading').textContent = 'Error loading content.';
+      }
+    }
+
+    loadContent();
+  </script>
+
+  <style>
+    .page-container { max-width: 800px; margin: 0 auto; padding: 3rem 1.25rem; font-family: system-ui; }
+    .status-message { text-align: center; font-size: 1.25rem; color: #64748b; }
+    .locked-container { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 12px; padding: 2rem; text-align: center; }
+    .locked-container h2 { color: #0f172a; margin-top: 0; }
+    .locked-container ul { list-style-position: inside; color: #ef4444; font-weight: bold; margin-bottom: 1.5rem; }
+    .unlock-btn { background: #0f172a; color: white; border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 1rem; cursor: pointer; }
+    .download-btn { display: inline-block; background: #38bdf8; color: #0f172a; text-decoration: none; padding: 1rem 2rem; border-radius: 8px; font-weight: bold; margin-top: 1rem; }
+  </style>
+</BaseLayout>
